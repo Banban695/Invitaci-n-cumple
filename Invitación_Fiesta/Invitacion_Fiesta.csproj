@@ -7,9 +7,30 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="wwwroot\css\site.css" />
-    <None Include="wwwroot\index.html" />
-    <None Include="wwwroot\js\site.js" />
+    <Content Include="css\img\cute_stitch.jpg" />
+    <Content Include="css\img\Eve.jpeg" />
+    <Content Include="css\img\fiesta.png" />
+    <Content Include="css\img\goku.jpg" />
+    <Content Include="css\img\Hermana.jpeg" />
+    <Content Include="css\img\heroo.png" />
+    <Content Include="css\img\HEROOO.png" />
+    <Content Include="css\img\kuromi.jpg" />
+    <Content Include="css\img\maquillaje.jpg" />
+    <Content Include="css\img\mariobros.jpg" />
+    <Content Include="css\img\miheroo.png" />
+    <Content Include="css\img\Paco.jpeg" />
+    <Content Include="css\img\princesas.jpg" />
+    <Content Include="css\img\rose-stitch.svg" />
+    <Content Include="css\img\Sakamoto.jpg" />
+    <Content Include="css\img\sulli.svg" />
+    <Content Include="css\img\Tokito.jpg" />
+    <Content Include="css\img\uraraka.jpg" />
+    <Content Include="css\img\uraraka.svg" />
+    <Content Include="css\site.css" />
+    <Content Include="index.html" />
+    <Content Include="js\site.js" />
+    <Content Include="sounds\Cortina.m4a" />
+    <Content Include="sounds\optimista_Caloncho.mp3" />
   </ItemGroup>
 
 </Project>
