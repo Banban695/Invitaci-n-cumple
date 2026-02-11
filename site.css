@@ -41,7 +41,7 @@ body {
     align-items: center;
     justify-content: center;
     text-align: center;
-    background: url("img/miheroo.png") center 55% / cover no-repeat;
+    background: url("miheroo.png") center 55% / cover no-repeat;
     width: 100%;
     max-width: 1100px;
     margin: clamp(25px, 6vw, 90px) auto;
