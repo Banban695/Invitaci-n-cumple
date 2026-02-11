@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
@@ -7,30 +7,30 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Include="css\img\cute_stitch.jpg" />
-    <Content Include="css\img\Eve.jpeg" />
-    <Content Include="css\img\fiesta.png" />
-    <Content Include="css\img\goku.jpg" />
-    <Content Include="css\img\Hermana.jpeg" />
-    <Content Include="css\img\heroo.png" />
-    <Content Include="css\img\HEROOO.png" />
-    <Content Include="css\img\kuromi.jpg" />
-    <Content Include="css\img\maquillaje.jpg" />
-    <Content Include="css\img\mariobros.jpg" />
-    <Content Include="css\img\miheroo.png" />
-    <Content Include="css\img\Paco.jpeg" />
-    <Content Include="css\img\princesas.jpg" />
-    <Content Include="css\img\rose-stitch.svg" />
-    <Content Include="css\img\Sakamoto.jpg" />
-    <Content Include="css\img\sulli.svg" />
-    <Content Include="css\img\Tokito.jpg" />
-    <Content Include="css\img\uraraka.jpg" />
-    <Content Include="css\img\uraraka.svg" />
-    <Content Include="css\site.css" />
-    <Content Include="index.html" />
-    <Content Include="js\site.js" />
-    <Content Include="sounds\Cortina.m4a" />
-    <Content Include="sounds\optimista_Caloncho.mp3" />
+    <None Include="wwwroot\img\cute_stitch.jpg" />
+    <None Include="wwwroot\img\Eve.jpeg" />
+    <None Include="wwwroot\img\fiesta.png" />
+    <None Include="wwwroot\img\goku.jpg" />
+    <None Include="wwwroot\img\Hermana.jpeg" />
+    <None Include="wwwroot\img\heroo.png" />
+    <None Include="wwwroot\img\HEROOO.png" />
+    <None Include="wwwroot\img\kuromi.jpg" />
+    <None Include="wwwroot\img\maquillaje.jpg" />
+    <None Include="wwwroot\img\mariobros.jpg" />
+    <None Include="wwwroot\img\miheroo.png" />
+    <None Include="wwwroot\img\Paco.jpeg" />
+    <None Include="wwwroot\img\princesas.jpg" />
+    <None Include="wwwroot\img\rose-stitch.svg" />
+    <None Include="wwwroot\img\Sakamoto.jpg" />
+    <None Include="wwwroot\img\sulli.svg" />
+    <None Include="wwwroot\img\Tokito.jpg" />
+    <None Include="wwwroot\img\uraraka.jpg" />
+    <None Include="wwwroot\img\uraraka.svg" />
+    <None Include="wwwroot\css\site.css" />
+    <None Include="wwwroot\index.html" />
+    <None Include="wwwroot\js\site.js" />
+    <None Include="wwwroot\sounds\Cortina.m4a" />
+    <None Include="wwwroot\sounds\optimista_Caloncho.mp3" />
   </ItemGroup>
 
 </Project>
