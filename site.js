@@ -86,67 +86,72 @@ document.addEventListener("DOMContentLoaded", () => {
     setInterval(updateCountdown, 1000);
     updateCountdown();
 
-});
+    /* ===== SLIDERS ===== */
+    document.querySelectorAll("[data-slider]").forEach(slider => {
 
-/* ===== SLIDERS ===== */
-document.querySelectorAll("[data-slider]").forEach(slider => {
+        let index = 0;
+        const images = slider.querySelectorAll("img");
 
-    let index = 0;
-    const images = slider.querySelectorAll("img");
+        // Contenedor que incluye slider + botones
+        const sliderContainer = slider.closest(".iphone-screen");
+        const prev = sliderContainer.querySelector(".prev");
+        const next = sliderContainer.querySelector(".next");
 
-    // Contenedor que incluye slider + botones
-    const sliderContainer = slider.closest(".iphone-screen");
-    const prev = sliderContainer.querySelector(".prev");
-    const next = sliderContainer.querySelector(".next");
-
-    function updateSlider() {
-        slider.style.transform = `translateX(-${index * 100}%)`;
-    }
-
-    next.addEventListener("click", () => {
-        index = (index + 1) % images.length;
-        updateSlider();
-    });
-
-    prev.addEventListener("click", () => {
-        index = (index - 1 + images.length) % images.length;
-        updateSlider();
-    });
-
-    /* Swipe móvil */
-    let startX = 0;
-    slider.addEventListener("touchstart", e => startX = e.touches[0].clientX);
-    slider.addEventListener("touchend", e => {
-        let endX = e.changedTouches[0].clientX;
-        if (startX - endX > 50) next.click();
-        if (endX - startX > 50) prev.click();
-    });
-
-});
-
-/* ===== DIVIDERS ANIMATION ===== */
-const dividers = document.querySelectorAll(".title-divider, .mini-title-divider");
-const dividerObserver = new IntersectionObserver(entries => {
-    entries.forEach(entry => {
-        if (entry.isIntersecting) {
-            entry.target.classList.add("active-divider");
+        function updateSlider() {
+            slider.style.transform = `translateX(-${index * 100}%)`;
         }
+
+        next.addEventListener("click", () => {
+            index = (index + 1) % images.length;
+            updateSlider();
+        });
+
+        prev.addEventListener("click", () => {
+            index = (index - 1 + images.length) % images.length;
+            updateSlider();
+        });
+
+        /* Swipe móvil */
+        let startX = 0;
+        slider.addEventListener("touchstart", e => startX = e.touches[0].clientX);
+        slider.addEventListener("touchend", e => {
+            let endX = e.changedTouches[0].clientX;
+            if (startX - endX > 50) next.click();
+            if (endX - startX > 50) prev.click();
+        });
+
     });
-}, { threshold: 0.4 });
-dividers.forEach(div => dividerObserver.observe(div));
 
-/* ===== MUSIC TOGGLE ===== */
-const music = document.getElementById("bgMusic");
-const toggleBtn = document.getElementById("musicToggle");
-let isPlaying = false;
+    /* ===== DIVIDERS ANIMATION ===== */
+    const dividers = document.querySelectorAll(".title-divider, .mini-title-divider");
+    const dividerObserver = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add("active-divider");
+            }
+        });
+    }, { threshold: 0.4 });
+    dividers.forEach(div => dividerObserver.observe(div));
 
-toggleBtn.addEventListener("click", () => {
-    if (isPlaying) {
-        music.pause();
-        toggleBtn.classList.remove("active");
-    } else {
-        music.play().catch(() => {});
-        toggleBtn.classList.add("active");
-    }
-    isPlaying = !isPlaying;
+    /* ===== MUSIC TOGGLE ===== */
+    toggleBtn.addEventListener("click", () => {
+        if (isPlaying) {
+            music.pause();
+            toggleBtn.classList.remove("active");
+        } else {
+            music.play().catch(() => {});
+            toggleBtn.classList.add("active");
+        }
+        isPlaying = !isPlaying;
+    });
+
+    /* ===== AUTOPLAY EN PRIMER CLICK (opcional) ===== */
+    document.addEventListener("click", () => {
+        if (!isPlaying) {
+            music.play().catch(() => {});
+            isPlaying = true;
+            toggleBtn.classList.add("active");
+        }
+    }, { once: true });
+
 });
