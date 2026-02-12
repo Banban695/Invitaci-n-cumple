@@ -1,138 +1,131 @@
-// =========================
+// ==============================
 // ELEMENTOS PRINCIPALES
-// =========================
-const enterBtn = document.getElementById('enterBtn');
-const introCurtain = document.getElementById('introCurtain');
-const curtainSound = document.getElementById('curtainSound');
-const bgMusic = document.getElementById('bgMusic');
-const musicBtn = document.getElementById('musicToggle');
+// ==============================
+const enterBtn = document.getElementById("enterBtn");
+const introCurtain = document.getElementById("introCurtain");
+const curtainSound = document.getElementById("curtainSound");
+const bgMusic = document.getElementById("bgMusic");
+const musicToggle = document.getElementById("musicToggle");
 
-const countdown = {
-    days: document.getElementById('days'),
-    hours: document.getElementById('hours'),
-    minutes: document.getElementById('minutes'),
-    seconds: document.getElementById('seconds')
-};
-
-// =========================
-// FUNCIONES DE REPRODUCCIÓN MÚSICA
-// =========================
-let musicStarted = false;
-
-function startMusic(){
-    if(!musicStarted){
-        bgMusic.play().catch(err => console.log('Autoplay bloqueado', err));
-        musicStarted = true;
-        musicBtn.classList.add('active');
+// ==============================
+// FUNCION CORTINA
+// ==============================
+enterBtn.addEventListener("click", () => {
+    // Reproducir sonido de cortina si existe
+    if (curtainSound) {
+        curtainSound.currentTime = 0;
+        curtainSound.play().catch(e => console.log("Sonido cortina bloqueado:", e));
     }
-}
 
-// Escucha el primer clic o scroll para activar música
-function initMusicEvent(e){
-    startMusic();
-    window.removeEventListener('click', initMusicEvent);
-    window.removeEventListener('scroll', initMusicEvent);
-}
+    // Ocultar cortina
+    const blur = introCurtain.querySelector(".intro-blur");
+    blur.classList.add("hide");
 
-window.addEventListener('click', initMusicEvent, {once:true});
-window.addEventListener('scroll', initMusicEvent, {once:true});
+    // Después de la transición, eliminar del DOM para mejorar performance
+    setTimeout(() => {
+        introCurtain.style.display = "none";
+    }, 1000);
 
-// =========================
-// CORTINA DE ENTRADA
-// =========================
-enterBtn.addEventListener('click', () => {
-    introCurtain.classList.add('hide');
-
-    curtainSound.play().catch(err => console.log('Cortina sonido bloqueado', err));
+    // Reproducir música de fondo
+    if (bgMusic) {
+        bgMusic.play().catch(e => console.log("Música bloqueada hasta interacción:", e));
+        musicToggle.classList.add("active"); // Animación del botón
+    }
 });
 
-// =========================
-// BOTÓN MÚSICA
-// =========================
-musicBtn.addEventListener('click', () => {
-    if(bgMusic.paused){
+// ==============================
+// BOTÓN PAUSA / PLAY MÚSICA
+// ==============================
+musicToggle.addEventListener("click", () => {
+    if (bgMusic.paused) {
         bgMusic.play();
-        musicBtn.classList.add('active');
+        musicToggle.classList.add("active");
     } else {
         bgMusic.pause();
-        musicBtn.classList.remove('active');
+        musicToggle.classList.remove("active");
     }
 });
 
-// =========================
+// ==============================
 // COUNTDOWN
-// =========================
-const targetDate = new Date('March 7, 2026 16:00:00').getTime();
+// ==============================
+const countdownDate = new Date("March 7, 2026 16:00:00").getTime();
+const daysEl = document.getElementById("days");
+const hoursEl = document.getElementById("hours");
+const minutesEl = document.getElementById("minutes");
+const secondsEl = document.getElementById("seconds");
 
-function updateCountdown(){
+function updateCountdown() {
     const now = new Date().getTime();
-    const distance = targetDate - now;
+    const distance = countdownDate - now;
 
-    if(distance < 0){
-        countdown.days.textContent = '00';
-        countdown.hours.textContent = '00';
-        countdown.minutes.textContent = '00';
-        countdown.seconds.textContent = '00';
+    if (distance < 0) {
+        daysEl.textContent = "00";
+        hoursEl.textContent = "00";
+        minutesEl.textContent = "00";
+        secondsEl.textContent = "00";
+        clearInterval(countdownInterval);
         return;
     }
 
     const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-    const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-    const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-    const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+    const hours = Math.floor((distance / (1000 * 60 * 60)) % 24);
+    const minutes = Math.floor((distance / (1000 * 60)) % 60);
+    const seconds = Math.floor((distance / 1000) % 60);
 
-    countdown.days.textContent = String(days).padStart(2,'0');
-    countdown.hours.textContent = String(hours).padStart(2,'0');
-    countdown.minutes.textContent = String(minutes).padStart(2,'0');
-    countdown.seconds.textContent = String(seconds).padStart(2,'0');
+    daysEl.textContent = String(days).padStart(2, "0");
+    hoursEl.textContent = String(hours).padStart(2, "0");
+    minutesEl.textContent = String(minutes).padStart(2, "0");
+    secondsEl.textContent = String(seconds).padStart(2, "0");
 }
 
-setInterval(updateCountdown, 1000);
+const countdownInterval = setInterval(updateCountdown, 1000);
 updateCountdown();
 
-// =========================
-// SLIDER IPHONE
-// =========================
-const sliders = document.querySelectorAll('[data-slider]');
-
-sliders.forEach(slider => {
+// ==============================
+// SLIDERS IPHONE
+// ==============================
+document.querySelectorAll(".iphone-card").forEach(card => {
+    const slider = card.querySelector(".slider");
+    const prevBtn = card.querySelector(".prev");
+    const nextBtn = card.querySelector(".next");
     let index = 0;
-    const images = slider.querySelectorAll('img');
-    const prevBtn = slider.parentElement.querySelector('.prev');
-    const nextBtn = slider.parentElement.querySelector('.next');
 
-    function showSlide(i){
-        slider.style.transform = `translateX(${-i * 100}%)`;
+    const slides = slider.querySelectorAll("img");
+
+    function updateSlider() {
+        slider.style.transform = `translateX(-${index * 100}%)`;
     }
 
-    prevBtn.addEventListener('click', () => {
-        index = (index - 1 + images.length) % images.length;
-        showSlide(index);
+    prevBtn.addEventListener("click", () => {
+        index = (index - 1 + slides.length) % slides.length;
+        updateSlider();
     });
 
-    nextBtn.addEventListener('click', () => {
-        index = (index + 1) % images.length;
-        showSlide(index);
+    nextBtn.addEventListener("click", () => {
+        index = (index + 1) % slides.length;
+        updateSlider();
     });
-
-    showSlide(index);
 });
 
-// =========================
-// FADE AL SCROLL
-// =========================
-const faders = document.querySelectorAll('.fade-section');
+// ==============================
+// ANIMACION FADE AL SCROLL
+// ==============================
+const faders = document.querySelectorAll(".fade-section");
 
-function checkFade(){
-    const triggerBottom = window.innerHeight * 0.85;
+const appearOptions = {
+    threshold: 0.2,
+    rootMargin: "0px 0px -50px 0px"
+};
 
-    faders.forEach(fader => {
-        const faderTop = fader.getBoundingClientRect().top;
-        if(faderTop < triggerBottom){
-            fader.classList.add('visible');
-        }
+const appearOnScroll = new IntersectionObserver((entries, observer) => {
+    entries.forEach(entry => {
+        if (!entry.isIntersecting) return;
+        entry.target.classList.add("visible");
+        observer.unobserve(entry.target);
     });
-}
+}, appearOptions);
 
-window.addEventListener('scroll', checkFade);
-window.addEventListener('load', checkFade);
+faders.forEach(fader => {
+    appearOnScroll.observe(fader);
+});
