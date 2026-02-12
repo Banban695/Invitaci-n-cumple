@@ -1,131 +1,172 @@
-// ==============================
-// ELEMENTOS PRINCIPALES
-// ==============================
-const enterBtn = document.getElementById("enterBtn");
-const introCurtain = document.getElementById("introCurtain");
-const curtainSound = document.getElementById("curtainSound");
-const bgMusic = document.getElementById("bgMusic");
-const musicToggle = document.getElementById("musicToggle");
+document.addEventListener("DOMContentLoaded", () => {
 
-// ==============================
-// FUNCION CORTINA
-// ==============================
-enterBtn.addEventListener("click", () => {
-    // Reproducir sonido de cortina si existe
-    if (curtainSound) {
-        curtainSound.currentTime = 0;
-        curtainSound.play().catch(e => console.log("Sonido cortina bloqueado:", e));
+    /* ===== FADE SECTIONS ===== */
+
+    const sections = document.querySelectorAll(".fade-section");
+
+    const observer = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add("visible");
+                observer.unobserve(entry.target);
+            }
+        });
+    }, { threshold: 0.15 });
+
+    sections.forEach(section => observer.observe(section));
+
+
+    /* ===== CORTINA ===== */
+
+    const enterBtn = document.getElementById("enterBtn");
+    const curtain = document.getElementById("introCurtain");
+    const sound = document.getElementById("curtainSound");
+
+    if (enterBtn && curtain) {
+
+        enterBtn.addEventListener("click", () => {
+
+            // 🔊 Sonido
+            if (sound) {
+                sound.currentTime = 0;
+                sound.play().catch(() => { });
+            }
+
+            // ✨ Animación fade
+            curtain.style.opacity = "0";
+            curtain.style.transition = "opacity 1s ease";
+
+            setTimeout(() => {
+                curtain.style.display = "none";
+                document.body.style.overflow = "auto";
+            }, 1000);
+
+        });
+
     }
 
-    // Ocultar cortina
-    const blur = introCurtain.querySelector(".intro-blur");
-    blur.classList.add("hide");
+    const eventDate = new Date("March 07, 2026 16:00:00").getTime();
 
-    // Después de la transición, eliminar del DOM para mejorar performance
-    setTimeout(() => {
-        introCurtain.style.display = "none";
-    }, 1000);
+    function updateCountdown() {
 
-    // Reproducir música de fondo
-    if (bgMusic) {
-        bgMusic.play().catch(e => console.log("Música bloqueada hasta interacción:", e));
-        musicToggle.classList.add("active"); // Animación del botón
+        const now = new Date().getTime();
+        const distance = eventDate - now;
+
+        const d = Math.floor(distance / (1000 * 60 * 60 * 24));
+        const h = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const m = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+        const s = Math.floor((distance % (1000 * 60)) / 1000);
+
+        animateNumber("days", d);
+        animateNumber("hours", h);
+        animateNumber("minutes", m);
+        animateNumber("seconds", s);
+
+        /* Glow cuando faltan menos de 3 días */
+
+        if (d <= 3) {
+            document.querySelectorAll(".time-box")
+                .forEach(box => box.classList.add("urgent"));
+        }
+
     }
+
+    function animateNumber(id, newValue) {
+
+        const el = document.getElementById(id);
+
+        if (el.textContent != String(newValue).padStart(2, "0")) {
+
+            el.classList.add("flip");
+
+            setTimeout(() => {
+                el.textContent = String(newValue).padStart(2, "0");
+                el.classList.remove("flip");
+            }, 200);
+
+        }
+
+    }
+
+    setInterval(updateCountdown, 1000);
+    updateCountdown();
+
+
 });
+document.querySelectorAll("[data-slider]").forEach(slider => {
 
-// ==============================
-// BOTÓN PAUSA / PLAY MÚSICA
-// ==============================
-musicToggle.addEventListener("click", () => {
-    if (bgMusic.paused) {
-        bgMusic.play();
-        musicToggle.classList.add("active");
-    } else {
-        bgMusic.pause();
-        musicToggle.classList.remove("active");
-    }
-});
-
-// ==============================
-// COUNTDOWN
-// ==============================
-const countdownDate = new Date("March 7, 2026 16:00:00").getTime();
-const daysEl = document.getElementById("days");
-const hoursEl = document.getElementById("hours");
-const minutesEl = document.getElementById("minutes");
-const secondsEl = document.getElementById("seconds");
-
-function updateCountdown() {
-    const now = new Date().getTime();
-    const distance = countdownDate - now;
-
-    if (distance < 0) {
-        daysEl.textContent = "00";
-        hoursEl.textContent = "00";
-        minutesEl.textContent = "00";
-        secondsEl.textContent = "00";
-        clearInterval(countdownInterval);
-        return;
-    }
-
-    const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-    const hours = Math.floor((distance / (1000 * 60 * 60)) % 24);
-    const minutes = Math.floor((distance / (1000 * 60)) % 60);
-    const seconds = Math.floor((distance / 1000) % 60);
-
-    daysEl.textContent = String(days).padStart(2, "0");
-    hoursEl.textContent = String(hours).padStart(2, "0");
-    minutesEl.textContent = String(minutes).padStart(2, "0");
-    secondsEl.textContent = String(seconds).padStart(2, "0");
-}
-
-const countdownInterval = setInterval(updateCountdown, 1000);
-updateCountdown();
-
-// ==============================
-// SLIDERS IPHONE
-// ==============================
-document.querySelectorAll(".iphone-card").forEach(card => {
-    const slider = card.querySelector(".slider");
-    const prevBtn = card.querySelector(".prev");
-    const nextBtn = card.querySelector(".next");
     let index = 0;
+    const images = slider.querySelectorAll("img");
 
-    const slides = slider.querySelectorAll("img");
+    const prev = slider.parentElement.querySelector(".prev");
+    const next = slider.parentElement.querySelector(".next");
 
     function updateSlider() {
         slider.style.transform = `translateX(-${index * 100}%)`;
     }
 
-    prevBtn.addEventListener("click", () => {
-        index = (index - 1 + slides.length) % slides.length;
+    next.addEventListener("click", () => {
+        index = (index + 1) % images.length;
         updateSlider();
     });
 
-    nextBtn.addEventListener("click", () => {
-        index = (index + 1) % slides.length;
+    prev.addEventListener("click", () => {
+        index = (index - 1 + images.length) % images.length;
         updateSlider();
     });
+
+    /* Swipe móvil */
+    let startX = 0;
+
+    slider.addEventListener("touchstart", e => {
+        startX = e.touches[0].clientX;
+    });
+
+    slider.addEventListener("touchend", e => {
+        let endX = e.changedTouches[0].clientX;
+
+        if (startX - endX > 50) next.click();
+        if (endX - startX > 50) prev.click();
+    });
+
 });
+const dividers = document.querySelectorAll(
+    ".title-divider, .mini-title-divider"
+);
 
-// ==============================
-// ANIMACION FADE AL SCROLL
-// ==============================
-const faders = document.querySelectorAll(".fade-section");
-
-const appearOptions = {
-    threshold: 0.2,
-    rootMargin: "0px 0px -50px 0px"
-};
-
-const appearOnScroll = new IntersectionObserver((entries, observer) => {
+const dividerObserver = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
-        if (!entry.isIntersecting) return;
-        entry.target.classList.add("visible");
-        observer.unobserve(entry.target);
+        if (entry.isIntersecting) {
+            entry.target.classList.add("active-divider");
+        }
     });
-}, appearOptions);
-
-faders.forEach(fader => {
-    appearOnScroll.observe(fader);
+}, {
+    threshold: 0.4
 });
+
+dividers.forEach(div => dividerObserver.observe(div));
+
+const music = document.getElementById("bgMusic");
+const toggleBtn = document.getElementById("musicToggle");
+
+let isPlaying = false;
+
+toggleBtn.addEventListener("click", () => {
+
+    if (isPlaying) {
+        music.pause();
+        toggleBtn.classList.remove("active");
+    } else {
+        music.play();
+        toggleBtn.classList.add("active");
+    }
+
+    isPlaying = !isPlaying;
+});
+document.addEventListener("click", () => {
+    if (!isPlaying) {
+        music.play();
+        isPlaying = true;
+        toggleBtn.classList.add("active");
+    }
+}, { once: true });
