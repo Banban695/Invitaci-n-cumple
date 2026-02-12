@@ -34,10 +34,10 @@ document.addEventListener("DOMContentLoaded", () => {
         enterBtn.addEventListener("click", () => {
 
             // 🔊 Sonido cortina
-            if (curtainSound) {
-                curtainSound.currentTime = 0;
-                curtainSound.play().catch(() => {});
-            }
+           // if (curtainSound) {
+                //curtainSound.currentTime = 0;
+                //curtainSound.play().catch(() => {});
+           // }
 
             // ✨ Animación cortina
             curtain.style.opacity = "0";
