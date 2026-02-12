@@ -146,27 +146,37 @@ const dividerObserver = new IntersectionObserver((entries) => {
 
 dividers.forEach(div => dividerObserver.observe(div));
 
-const music = document.getElementById("bgMusic");
-const toggleBtn = document.getElementById("musicToggle");
+// Botón de música
+const musicToggle = document.getElementById("musicToggle");
+const bgMusic = document.getElementById("bgMusic");
 
-let isPlaying = false;
-
-toggleBtn.addEventListener("click", () => {
-
-    if (isPlaying) {
-        music.pause();
-        toggleBtn.classList.remove("active");
+// Función para alternar música
+function toggleMusic() {
+    if (bgMusic.paused) {
+        bgMusic.play().catch(e => console.log("Música bloqueada:", e));
+        musicToggle.classList.add("active");
     } else {
-        music.play();
-        toggleBtn.classList.add("active");
+        bgMusic.pause();
+        musicToggle.classList.remove("active");
     }
+}
 
-    isPlaying = !isPlaying;
+// Evento clic en el botón de música
+musicToggle.addEventListener("click", toggleMusic);
+
+// 🎉 Reproducir música al entrar después de la cortina
+enterBtn.addEventListener("click", () => {
+    const blur = introCurtain.querySelector(".intro-blur");
+    blur.classList.add("hide");
+
+    blur.addEventListener("transitionend", () => {
+        introCurtain.style.display = "none";
+        
+        // Esto asegura que el audio se reproduzca tras la interacción
+        bgMusic.play().then(() => {
+            musicToggle.classList.add("active");
+        }).catch(e => {
+            console.log("Música bloqueada hasta que el usuario haga clic:", e);
+        });
+    }, { once: true });
 });
-document.addEventListener("click", () => {
-    if (!isPlaying) {
-        music.play();
-        isPlaying = true;
-        toggleBtn.classList.add("active");
-    }
-}, { once: true });
