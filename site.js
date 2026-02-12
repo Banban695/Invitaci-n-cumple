@@ -1,7 +1,6 @@
-﻿document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", () => {
 
     /* ===== FADE SECTIONS ===== */
-
     const sections = document.querySelectorAll(".fade-section");
 
     const observer = new IntersectionObserver(entries => {
@@ -17,13 +16,11 @@
 
 
     /* ===== CORTINA ===== */
-
     const enterBtn = document.getElementById("enterBtn");
     const curtain = document.getElementById("introCurtain");
     const sound = document.getElementById("curtainSound");
 
     if (enterBtn && curtain) {
-
         enterBtn.addEventListener("click", () => {
 
             // 🔊 Sonido
@@ -42,13 +39,13 @@
             }, 1000);
 
         });
-
     }
 
+
+    /* ===== COUNTDOWN ===== */
     const eventDate = new Date("March 07, 2026 16:00:00").getTime();
 
     function updateCountdown() {
-
         const now = new Date().getTime();
         const distance = eventDate - now;
 
@@ -63,43 +60,39 @@
         animateNumber("seconds", s);
 
         /* Glow cuando faltan menos de 3 días */
-
         if (d <= 3) {
-            document.querySelectorAll(".time-box")
-                .forEach(box => box.classList.add("urgent"));
+            document.querySelectorAll(".time-box").forEach(box => box.classList.add("urgent"));
         }
-
     }
 
     function animateNumber(id, newValue) {
-
         const el = document.getElementById(id);
 
         if (el.textContent != String(newValue).padStart(2, "0")) {
-
             el.classList.add("flip");
-
             setTimeout(() => {
                 el.textContent = String(newValue).padStart(2, "0");
                 el.classList.remove("flip");
             }, 200);
-
         }
-
     }
 
     setInterval(updateCountdown, 1000);
     updateCountdown();
 
-
 });
+
+
+/* ===== SLIDERS ===== */
 document.querySelectorAll("[data-slider]").forEach(slider => {
 
     let index = 0;
     const images = slider.querySelectorAll("img");
 
-    const prev = slider.parentElement.querySelector(".prev");
-    const next = slider.parentElement.querySelector(".next");
+    // Tomamos los botones prev/next del mismo slider
+    const sliderContainer = slider.closest(".iphone-screen");
+    const prev = sliderContainer.querySelector(".prev");
+    const next = sliderContainer.querySelector(".next");
 
     function updateSlider() {
         slider.style.transform = `translateX(-${index * 100}%)`;
@@ -117,22 +110,18 @@ document.querySelectorAll("[data-slider]").forEach(slider => {
 
     /* Swipe móvil */
     let startX = 0;
-
-    slider.addEventListener("touchstart", e => {
-        startX = e.touches[0].clientX;
-    });
-
+    slider.addEventListener("touchstart", e => startX = e.touches[0].clientX);
     slider.addEventListener("touchend", e => {
         let endX = e.changedTouches[0].clientX;
-
         if (startX - endX > 50) next.click();
         if (endX - startX > 50) prev.click();
     });
 
 });
-const dividers = document.querySelectorAll(
-    ".title-divider, .mini-title-divider"
-);
+
+
+/* ===== DIVIDERS ANIMATION ===== */
+const dividers = document.querySelectorAll(".title-divider, .mini-title-divider");
 
 const dividerObserver = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
@@ -140,19 +129,18 @@ const dividerObserver = new IntersectionObserver((entries) => {
             entry.target.classList.add("active-divider");
         }
     });
-}, {
-    threshold: 0.4
-});
+}, { threshold: 0.4 });
 
 dividers.forEach(div => dividerObserver.observe(div));
 
+
+/* ===== MÚSICA ===== */
 const music = document.getElementById("bgMusic");
 const toggleBtn = document.getElementById("musicToggle");
 
 let isPlaying = false;
 
 toggleBtn.addEventListener("click", () => {
-
     if (isPlaying) {
         music.pause();
         toggleBtn.classList.remove("active");
@@ -160,9 +148,9 @@ toggleBtn.addEventListener("click", () => {
         music.play();
         toggleBtn.classList.add("active");
     }
-
     isPlaying = !isPlaying;
 });
+
 document.addEventListener("click", () => {
     if (!isPlaying) {
         music.play();
