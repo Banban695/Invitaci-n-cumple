@@ -31,28 +31,31 @@ document.addEventListener("DOMContentLoaded", () => {
                 sound.play().catch(() => {});
             }
 
-            // 🔊 Música de fondo
-            if (music && !isPlaying) {
-                music.play().catch(() => {});
-                isPlaying = true;
-                toggleBtn.classList.add("active");
-            }
-
             // ✨ Animación fade
             curtain.style.opacity = "0";
             curtain.style.transition = "opacity 1s ease";
-
             setTimeout(() => {
                 curtain.style.display = "none";
                 document.body.style.overflow = "auto";
             }, 1000);
 
+            // 🔊 Música de fondo (después del click del usuario)
+            if (music && !isPlaying) {
+                // Pequeño delay para asegurar que el navegador permita play
+                setTimeout(() => {
+                    music.play().then(() => {
+                        isPlaying = true;
+                        toggleBtn.classList.add("active");
+                    }).catch(err => {
+                        console.warn("Autoplay bloqueado:", err);
+                    });
+                }, 50);
+            }
         });
     }
 
     /* ===== COUNTDOWN ===== */
     const eventDate = new Date("March 07, 2026 16:00:00").getTime();
-
     function updateCountdown() {
         const now = new Date().getTime();
         const distance = eventDate - now;
@@ -86,72 +89,67 @@ document.addEventListener("DOMContentLoaded", () => {
     setInterval(updateCountdown, 1000);
     updateCountdown();
 
-    /* ===== SLIDERS ===== */
-    document.querySelectorAll("[data-slider]").forEach(slider => {
+});
 
-        let index = 0;
-        const images = slider.querySelectorAll("img");
+/* ===== SLIDERS ===== */
+document.querySelectorAll("[data-slider]").forEach(slider => {
 
-        // Contenedor que incluye slider + botones
-        const sliderContainer = slider.closest(".iphone-screen");
-        const prev = sliderContainer.querySelector(".prev");
-        const next = sliderContainer.querySelector(".next");
+    let index = 0;
+    const images = slider.querySelectorAll("img");
 
-        function updateSlider() {
-            slider.style.transform = `translateX(-${index * 100}%)`;
-        }
+    // Contenedor que incluye slider + botones
+    const sliderContainer = slider.closest(".iphone-screen");
+    const prev = sliderContainer.querySelector(".prev");
+    const next = sliderContainer.querySelector(".next");
 
-        next.addEventListener("click", () => {
-            index = (index + 1) % images.length;
-            updateSlider();
-        });
+    function updateSlider() {
+        slider.style.transform = `translateX(-${index * 100}%)`;
+    }
 
-        prev.addEventListener("click", () => {
-            index = (index - 1 + images.length) % images.length;
-            updateSlider();
-        });
-
-        /* Swipe móvil */
-        let startX = 0;
-        slider.addEventListener("touchstart", e => startX = e.touches[0].clientX);
-        slider.addEventListener("touchend", e => {
-            let endX = e.changedTouches[0].clientX;
-            if (startX - endX > 50) next.click();
-            if (endX - startX > 50) prev.click();
-        });
-
+    next.addEventListener("click", () => {
+        index = (index + 1) % images.length;
+        updateSlider();
     });
 
-    /* ===== DIVIDERS ANIMATION ===== */
-    const dividers = document.querySelectorAll(".title-divider, .mini-title-divider");
-    const dividerObserver = new IntersectionObserver(entries => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.classList.add("active-divider");
-            }
-        });
-    }, { threshold: 0.4 });
-    dividers.forEach(div => dividerObserver.observe(div));
-
-    /* ===== MUSIC TOGGLE ===== */
-    toggleBtn.addEventListener("click", () => {
-        if (isPlaying) {
-            music.pause();
-            toggleBtn.classList.remove("active");
-        } else {
-            music.play().catch(() => {});
-            toggleBtn.classList.add("active");
-        }
-        isPlaying = !isPlaying;
+    prev.addEventListener("click", () => {
+        index = (index - 1 + images.length) % images.length;
+        updateSlider();
     });
 
-    /* ===== AUTOPLAY EN PRIMER CLICK (opcional) ===== */
-    document.addEventListener("click", () => {
-        if (!isPlaying) {
-            music.play().catch(() => {});
-            isPlaying = true;
-            toggleBtn.classList.add("active");
-        }
-    }, { once: true });
+    /* Swipe móvil */
+    let startX = 0;
+    slider.addEventListener("touchstart", e => startX = e.touches[0].clientX);
+    slider.addEventListener("touchend", e => {
+        let endX = e.changedTouches[0].clientX;
+        if (startX - endX > 50) next.click();
+        if (endX - startX > 50) prev.click();
+    });
 
+});
+
+/* ===== DIVIDERS ANIMATION ===== */
+const dividers = document.querySelectorAll(".title-divider, .mini-title-divider");
+const dividerObserver = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            entry.target.classList.add("active-divider");
+        }
+    });
+}, { threshold: 0.4 });
+dividers.forEach(div => dividerObserver.observe(div));
+
+/* ===== MUSIC TOGGLE ===== */
+const music = document.getElementById("bgMusic");
+const toggleBtn = document.getElementById("musicToggle");
+let isPlaying = false;
+
+toggleBtn.addEventListener("click", () => {
+    if (isPlaying) {
+        music.pause();
+        toggleBtn.classList.remove("active");
+    } else {
+        music.play().catch(err => console.warn("Autoplay bloqueado:", err));
+        toggleBtn.classList.add("active");
+    }
+    isPlaying = !isPlaying;
 });
