@@ -1,4 +1,4 @@
-podrias darme el js corrgido: document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", () => {
 
     const enterBtn = document.getElementById("enterBtn");
     const curtain = document.getElementById("introCurtain");
