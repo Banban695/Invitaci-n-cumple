@@ -30,24 +30,42 @@ document.addEventListener("DOMContentLoaded", () => {
     /* ===== FUNCIONES MUSICA ===== */
 
     function startMusic() {
+
         if (!bgMusic || musicStarted) return;
 
-        bgMusic.play().then(() => {
-            musicStarted = true;
-            musicToggle?.classList.add("active");
-        }).catch(err => console.log("Autoplay bloqueado:", err));
+        const playPromise = bgMusic.play();
+
+        if (playPromise !== undefined) {
+            playPromise.then(() => {
+                musicStarted = true;
+                musicToggle?.classList.add("active");
+            }).catch(err => {
+                console.log("Autoplay bloqueado:", err);
+            });
+        }
     }
 
+
     function toggleMusic() {
+
         if (!bgMusic) return;
 
         if (bgMusic.paused) {
-            bgMusic.play();
-            musicToggle?.classList.add("active");
-            musicStarted = true;
+
+            const playPromise = bgMusic.play();
+
+            if (playPromise !== undefined) {
+                playPromise.then(() => {
+                    musicToggle?.classList.add("active");
+                    musicStarted = true;
+                }).catch(err => console.log("Play bloqueado:", err));
+            }
+
         } else {
+
             bgMusic.pause();
             musicToggle?.classList.remove("active");
+
         }
     }
 
@@ -66,8 +84,10 @@ document.addEventListener("DOMContentLoaded", () => {
                 curtainSound.play().catch(() => {});
             }
 
-            // 🔊 Música fondo
-            startMusic();
+            // ⏳ Pequeño delay para evitar conflicto entre audios
+            setTimeout(() => {
+                startMusic();
+            }, 200);
 
             // ✨ Animación cortina
             curtain.style.opacity = "0";
