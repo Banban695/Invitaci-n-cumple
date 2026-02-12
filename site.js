@@ -27,10 +27,10 @@ document.addEventListener("DOMContentLoaded", () => {
         enterBtn.addEventListener("click", () => {
 
             // 🔊 Sonido
-            if (sound) {
-                sound.currentTime = 0;
-                sound.play().catch(() => { });
-            }
+            //if (sound) {
+              //  sound.currentTime = 0;
+                //sound.play().catch(() => { });
+            //}
 
             // ✨ Animación fade
             curtain.style.opacity = "0";
