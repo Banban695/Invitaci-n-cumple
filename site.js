@@ -29,47 +29,38 @@ document.addEventListener("DOMContentLoaded", () => {
 
     /* ===== FUNCIONES MUSICA ===== */
 
-    function startMusic() {
+  function startMusic() {
+    if (!bgMusic || musicStarted) return;
 
-        if (!bgMusic || musicStarted) return;
+    bgMusic.currentTime = 0;
 
-        const playPromise = bgMusic.play();
+    const playPromise = bgMusic.play();
 
-        if (playPromise !== undefined) {
-            playPromise.then(() => {
+    if (playPromise !== undefined) {
+        playPromise
+            .then(() => {
                 musicStarted = true;
                 musicToggle?.classList.add("active");
-            }).catch(err => {
+            })
+            .catch(err => {
                 console.log("Autoplay bloqueado:", err);
             });
-        }
     }
+}
 
+function toggleMusic() {
+    if (!bgMusic) return;
 
-    function toggleMusic() {
-
-        if (!bgMusic) return;
-
-        if (bgMusic.paused) {
-
-            const playPromise = bgMusic.play();
-
-            if (playPromise !== undefined) {
-                playPromise.then(() => {
-                    musicToggle?.classList.add("active");
-                    musicStarted = true;
-                }).catch(err => console.log("Play bloqueado:", err));
-            }
-
-        } else {
-
-            bgMusic.pause();
-            musicToggle?.classList.remove("active");
-
-        }
+    if (bgMusic.paused) {
+        bgMusic.play().then(() => {
+            musicToggle?.classList.add("active");
+            musicStarted = true;
+        });
+    } else {
+        bgMusic.pause();
+        musicToggle?.classList.remove("active");
     }
-
-    musicToggle?.addEventListener("click", toggleMusic);
+}
 
 
     /* ===== CORTINA ===== */
