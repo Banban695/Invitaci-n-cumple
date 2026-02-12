@@ -1,6 +1,18 @@
 document.addEventListener("DOMContentLoaded", () => {
 
+    /* ===== ELEMENTOS ===== */
+
+    const enterBtn = document.getElementById("enterBtn");
+    const curtain = document.getElementById("introCurtain");
+    const curtainSound = document.getElementById("curtainSound");
+    const bgMusic = document.getElementById("bgMusic");
+    const musicToggle = document.getElementById("musicToggle");
+
+    let musicStarted = false;
+
+
     /* ===== FADE SECTIONS ===== */
+
     const sections = document.querySelectorAll(".fade-section");
 
     const observer = new IntersectionObserver(entries => {
@@ -14,10 +26,81 @@ document.addEventListener("DOMContentLoaded", () => {
 
     sections.forEach(section => observer.observe(section));
 
+
+    /* ===== CORTINA + MUSICA ===== */
+
+    if (enterBtn && curtain) {
+
+        enterBtn.addEventListener("click", () => {
+
+            // 🔊 Sonido cortina
+            if (curtainSound) {
+                curtainSound.currentTime = 0;
+                curtainSound.play().catch(() => {});
+            }
+
+            // ✨ Animación cortina
+            curtain.style.opacity = "0";
+            curtain.style.transition = "opacity 1s ease";
+
+            setTimeout(() => {
+                curtain.style.display = "none";
+                document.body.style.overflow = "auto";
+            }, 1000);
+
+
+            // 🎵 Música fondo (solo una vez)
+            if (!musicStarted && bgMusic) {
+
+                bgMusic.currentTime = 0;
+
+                bgMusic.play()
+                    .then(() => {
+                        musicStarted = true;
+                        musicToggle.classList.add("active");
+                    })
+                    .catch(err => {
+                        console.log("Autoplay bloqueado:", err);
+                    });
+
+            }
+
+        });
+
+    }
+
+
+    /* ===== BOTON MUSICA ===== */
+
+    if (musicToggle && bgMusic) {
+
+        musicToggle.addEventListener("click", () => {
+
+            if (bgMusic.paused) {
+
+                bgMusic.play()
+                    .then(() => {
+                        musicToggle.classList.add("active");
+                    });
+
+            } else {
+
+                bgMusic.pause();
+                musicToggle.classList.remove("active");
+
+            }
+
+        });
+
+    }
+
+
     /* ===== COUNTDOWN ===== */
+
     const eventDate = new Date("March 07, 2026 16:00:00").getTime();
 
     function updateCountdown() {
+
         const now = new Date().getTime();
         const distance = eventDate - now;
 
@@ -31,114 +114,57 @@ document.addEventListener("DOMContentLoaded", () => {
         animateNumber("minutes", m);
         animateNumber("seconds", s);
 
-        if (d <= 3) {
-            document.querySelectorAll(".time-box")
-                .forEach(box => box.classList.add("urgent"));
-        }
     }
 
-    function animateNumber(id, newValue) {
+    function animateNumber(id, value) {
+
         const el = document.getElementById(id);
 
-        if (el.textContent != String(newValue).padStart(2, "0")) {
+        if (!el) return;
+
+        const formatted = String(value).padStart(2, "0");
+
+        if (el.textContent !== formatted) {
+
             el.classList.add("flip");
+
             setTimeout(() => {
-                el.textContent = String(newValue).padStart(2, "0");
+                el.textContent = formatted;
                 el.classList.remove("flip");
             }, 200);
+
         }
+
     }
 
     setInterval(updateCountdown, 1000);
     updateCountdown();
 
-    /* ===== SLIDERS IPHONE ===== */
-    document.querySelectorAll("[data-slider]").forEach(slider => {
+});
 
-        let index = 0;
-        const images = slider.querySelectorAll("img");
 
-        const prev = slider.parentElement.querySelector(".prev");
-        const next = slider.parentElement.querySelector(".next");
+/* ===== SLIDERS ===== */
 
-        function updateSlider() {
-            slider.style.transform = `translateX(-${index * 100}%)`;
-        }
+document.querySelectorAll("[data-slider]").forEach(slider => {
 
-        next.addEventListener("click", () => {
-            index = (index + 1) % images.length;
-            updateSlider();
-        });
+    let index = 0;
+    const images = slider.querySelectorAll("img");
 
-        prev.addEventListener("click", () => {
-            index = (index - 1 + images.length) % images.length;
-            updateSlider();
-        });
+    const prev = slider.parentElement.querySelector(".prev");
+    const next = slider.parentElement.querySelector(".next");
 
-        // Swipe móvil
-        let startX = 0;
-        slider.addEventListener("touchstart", e => startX = e.touches[0].clientX);
-        slider.addEventListener("touchend", e => {
-            let endX = e.changedTouches[0].clientX;
-            if (startX - endX > 50) next.click();
-            if (endX - startX > 50) prev.click();
-        });
+    function updateSlider() {
+        slider.style.transform = `translateX(-${index * 100}%)`;
+    }
 
+    next.addEventListener("click", () => {
+        index = (index + 1) % images.length;
+        updateSlider();
     });
 
-    /* ===== DIVIDER ANIMATION ===== */
-    const dividers = document.querySelectorAll(".title-divider, .mini-title-divider");
-
-    const dividerObserver = new IntersectionObserver(entries => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.classList.add("active-divider");
-            }
-        });
-    }, { threshold: 0.4 });
-
-    dividers.forEach(div => dividerObserver.observe(div));
-
-    /* ===== CORTINA Y MÚSICA ===== */
-    const enterBtn = document.getElementById("enterBtn");
-    const introCurtain = document.getElementById("introCurtain");
-    const bgMusic = document.getElementById("bgMusic");
-    const musicToggle = document.getElementById("musicToggle");
-
-    if (enterBtn && introCurtain) {
-        enterBtn.addEventListener("click", () => {
-
-            // ✨ Animación fade de la cortina
-            const blur = introCurtain.querySelector(".intro-blur");
-            blur.classList.add("hide");
-
-            blur.addEventListener("transitionend", () => {
-                introCurtain.style.display = "none";
-                document.body.style.overflow = "auto";
-
-                // 🎶 Reproducir música de fondo
-                bgMusic.play().then(() => {
-                    musicToggle.classList.add("active");
-                }).catch(e => {
-                    console.log("Música bloqueada hasta que el usuario haga clic:", e);
-                });
-
-            }, { once: true });
-
-        });
-    }
-
-    // Botón para alternar música
-    function toggleMusic() {
-        if (bgMusic.paused) {
-            bgMusic.play().then(() => musicToggle.classList.add("active"))
-                .catch(e => console.log("Música bloqueada:", e));
-        } else {
-            bgMusic.pause();
-            musicToggle.classList.remove("active");
-        }
-    }
-
-    musicToggle.addEventListener("click", toggleMusic);
+    prev.addEventListener("click", () => {
+        index = (index - 1 + images.length) % images.length;
+        updateSlider();
+    });
 
 });
