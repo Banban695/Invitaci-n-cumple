@@ -151,10 +151,10 @@ toggleBtn.addEventListener("click", () => {
     isPlaying = !isPlaying;
 });
 
-document.addEventListener("click", () => {
-    if (!isPlaying) {
-        music.play();
-        isPlaying = true;
-        toggleBtn.classList.add("active");
-    }
-}, { once: true });
+//document.addEventListener("click", () => {
+    //if (!isPlaying) {
+        //music.play();
+        //isPlaying = true;
+        //toggleBtn.classList.add("active");
+   // }
+//}, { once: true });
