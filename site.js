@@ -17,7 +17,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const curtain = document.getElementById("introCurtain");
     const sound = document.getElementById("curtainSound");
 
-    // Música de fondo
+    /* ===== MÚSICA DE FONDO ===== */
     const music = document.getElementById("bgMusic");
     const toggleBtn = document.getElementById("musicToggle");
     let isPlaying = false;
@@ -25,13 +25,13 @@ document.addEventListener("DOMContentLoaded", () => {
     if (enterBtn && curtain) {
         enterBtn.addEventListener("click", () => {
 
-            // 🔊 Sonido cortina
+            // 🔊 Sonido de cortina
             if (sound) {
                 sound.currentTime = 0;
                 sound.play().catch(() => {});
             }
 
-            // ✨ Animación fade
+            // ✨ Animación fade de cortina
             curtain.style.opacity = "0";
             curtain.style.transition = "opacity 1s ease";
 
@@ -125,28 +125,35 @@ document.addEventListener("DOMContentLoaded", () => {
     }, { threshold: 0.4 });
     dividers.forEach(div => dividerObserver.observe(div));
 
-    /* ===== MUSIC PLAYBACK ===== */
-    // Reproducir música de fondo tras primera interacción del usuario
-    document.addEventListener("click", function initMusic() {
+    /* ===== MÚSICA AUTOPLAY CON PRIMERA INTERACCIÓN ===== */
+    function startMusic() {
         if (!isPlaying) {
             music.play().then(() => {
                 isPlaying = true;
                 toggleBtn.classList.add("active");
-            }).catch(err => {
-                console.warn("Autoplay bloqueado:", err);
-            });
+            }).catch(err => console.warn("Autoplay bloqueado:", err));
         }
-        document.removeEventListener("click", initMusic);
-    });
+        // Quitamos los listeners para no volver a disparar
+        document.removeEventListener("click", startMusic);
+        document.removeEventListener("touchstart", startMusic);
+        document.removeEventListener("scroll", startMusic);
+    }
 
-    // Toggle de música manual
+    // Escuchamos varias interacciones
+    document.addEventListener("click", startMusic);
+    document.addEventListener("touchstart", startMusic);
+    document.addEventListener("scroll", startMusic);
+
+    // Toggle manual de música
     toggleBtn.addEventListener("click", () => {
         if (isPlaying) {
             music.pause();
             toggleBtn.classList.remove("active");
         } else {
-            music.play().catch(err => console.warn("Autoplay bloqueado:", err));
-            toggleBtn.classList.add("active");
+            music.play().then(() => {
+                isPlaying = true;
+                toggleBtn.classList.add("active");
+            }).catch(err => console.warn("Autoplay bloqueado:", err));
         }
         isPlaying = !isPlaying;
     });
