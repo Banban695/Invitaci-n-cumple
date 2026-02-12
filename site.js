@@ -16,19 +16,45 @@ document.addEventListener("DOMContentLoaded", () => {
     sections.forEach(section => observer.observe(section));
 
 
-
-    /* ===== ELEMENTOS PRINCIPALES ===== */
+    /* ===== ELEMENTOS GENERALES ===== */
 
     const enterBtn = document.getElementById("enterBtn");
     const curtain = document.getElementById("introCurtain");
     const curtainSound = document.getElementById("curtainSound");
-
     const bgMusic = document.getElementById("bgMusic");
     const musicToggle = document.getElementById("musicToggle");
 
+    let musicStarted = false;
 
 
-    /* ===== CORTINA + MÚSICA ===== */
+    /* ===== FUNCIONES MUSICA ===== */
+
+    function startMusic() {
+        if (!bgMusic || musicStarted) return;
+
+        bgMusic.play().then(() => {
+            musicStarted = true;
+            musicToggle?.classList.add("active");
+        }).catch(err => console.log("Autoplay bloqueado:", err));
+    }
+
+    function toggleMusic() {
+        if (!bgMusic) return;
+
+        if (bgMusic.paused) {
+            bgMusic.play();
+            musicToggle?.classList.add("active");
+            musicStarted = true;
+        } else {
+            bgMusic.pause();
+            musicToggle?.classList.remove("active");
+        }
+    }
+
+    musicToggle?.addEventListener("click", toggleMusic);
+
+
+    /* ===== CORTINA ===== */
 
     if (enterBtn && curtain) {
 
@@ -40,12 +66,8 @@ document.addEventListener("DOMContentLoaded", () => {
                 curtainSound.play().catch(() => {});
             }
 
-            // 🎵 Música fondo
-            if (bgMusic) {
-                bgMusic.play().then(() => {
-                    musicToggle?.classList.add("active");
-                }).catch(e => console.log("Autoplay bloqueado:", e));
-            }
+            // 🔊 Música fondo
+            startMusic();
 
             // ✨ Animación cortina
             curtain.style.opacity = "0";
@@ -59,25 +81,6 @@ document.addEventListener("DOMContentLoaded", () => {
         });
 
     }
-
-
-
-    /* ===== BOTÓN DE MÚSICA ===== */
-
-    function toggleMusic() {
-        if (!bgMusic) return;
-
-        if (bgMusic.paused) {
-            bgMusic.play();
-            musicToggle?.classList.add("active");
-        } else {
-            bgMusic.pause();
-            musicToggle?.classList.remove("active");
-        }
-    }
-
-    musicToggle?.addEventListener("click", toggleMusic);
-
 
 
     /* ===== COUNTDOWN ===== */
@@ -103,6 +106,7 @@ document.addEventListener("DOMContentLoaded", () => {
             document.querySelectorAll(".time-box")
                 .forEach(box => box.classList.add("urgent"));
         }
+
     }
 
     function animateNumber(id, newValue) {
@@ -110,7 +114,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const el = document.getElementById(id);
         if (!el) return;
 
-        if (el.textContent !== String(newValue).padStart(2, "0")) {
+        if (el.textContent != String(newValue).padStart(2, "0")) {
 
             el.classList.add("flip");
 
@@ -120,6 +124,7 @@ document.addEventListener("DOMContentLoaded", () => {
             }, 200);
 
         }
+
     }
 
     setInterval(updateCountdown, 1000);
@@ -128,8 +133,7 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 
-
-/* ===== SLIDER ===== */
+/* ===== SLIDERS ===== */
 
 document.querySelectorAll("[data-slider]").forEach(slider => {
 
@@ -169,12 +173,11 @@ document.querySelectorAll("[data-slider]").forEach(slider => {
 });
 
 
-
 /* ===== DIVIDERS ===== */
 
 const dividers = document.querySelectorAll(".title-divider, .mini-title-divider");
 
-const dividerObserver = new IntersectionObserver((entries) => {
+const dividerObserver = new IntersectionObserver(entries => {
     entries.forEach(entry => {
         if (entry.isIntersecting) {
             entry.target.classList.add("active-divider");
