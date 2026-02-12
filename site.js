@@ -17,7 +17,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const curtain = document.getElementById("introCurtain");
     const sound = document.getElementById("curtainSound");
 
-    /* ===== MÚSICA DE FONDO ===== */
+    // Música de fondo
     const music = document.getElementById("bgMusic");
     const toggleBtn = document.getElementById("musicToggle");
     let isPlaying = false;
@@ -25,13 +25,13 @@ document.addEventListener("DOMContentLoaded", () => {
     if (enterBtn && curtain) {
         enterBtn.addEventListener("click", () => {
 
-            // 🔊 Sonido de cortina
+            // 🔊 Sonido cortina
             if (sound) {
                 sound.currentTime = 0;
                 sound.play().catch(() => {});
             }
 
-            // ✨ Animación fade de cortina
+            // ✨ Animación fade
             curtain.style.opacity = "0";
             curtain.style.transition = "opacity 1s ease";
 
@@ -39,6 +39,14 @@ document.addEventListener("DOMContentLoaded", () => {
                 curtain.style.display = "none";
                 document.body.style.overflow = "auto";
             }, 1000);
+
+            // 🔊 Música de fondo al abrir cortina
+            if (music && !isPlaying) {
+                music.play().then(() => {
+                    isPlaying = true;
+                    toggleBtn.classList.add("active");
+                }).catch(err => console.warn("Autoplay bloqueado:", err));
+            }
 
         });
     }
@@ -103,7 +111,7 @@ document.addEventListener("DOMContentLoaded", () => {
             updateSlider();
         });
 
-        /* Swipe móvil */
+        // Swipe móvil
         let startX = 0;
         slider.addEventListener("touchstart", e => startX = e.touches[0].clientX);
         slider.addEventListener("touchend", e => {
@@ -125,37 +133,34 @@ document.addEventListener("DOMContentLoaded", () => {
     }, { threshold: 0.4 });
     dividers.forEach(div => dividerObserver.observe(div));
 
-    /* ===== MÚSICA AUTOPLAY CON PRIMERA INTERACCIÓN ===== */
-    function startMusic() {
+    /* ===== MUSIC TOGGLE ===== */
+    toggleBtn.addEventListener("click", () => {
+        if (isPlaying) {
+            music.pause();
+            toggleBtn.classList.remove("active");
+        } else {
+            music.play().catch(err => console.warn("Autoplay bloqueado:", err));
+            toggleBtn.classList.add("active");
+        }
+        isPlaying = !isPlaying;
+    });
+
+    /* ===== AUTO-PLAY ADICIONAL PARA PRIMER INTERACTUACIÓN ===== */
+    function firstInteraction() {
         if (!isPlaying) {
             music.play().then(() => {
                 isPlaying = true;
                 toggleBtn.classList.add("active");
             }).catch(err => console.warn("Autoplay bloqueado:", err));
         }
-        // Quitamos los listeners para no volver a disparar
-        document.removeEventListener("click", startMusic);
-        document.removeEventListener("touchstart", startMusic);
-        document.removeEventListener("scroll", startMusic);
+
+        document.removeEventListener("click", firstInteraction);
+        document.removeEventListener("touchstart", firstInteraction);
+        document.removeEventListener("scroll", firstInteraction);
     }
 
-    // Escuchamos varias interacciones
-    document.addEventListener("click", startMusic);
-    document.addEventListener("touchstart", startMusic);
-    document.addEventListener("scroll", startMusic);
-
-    // Toggle manual de música
-    toggleBtn.addEventListener("click", () => {
-        if (isPlaying) {
-            music.pause();
-            toggleBtn.classList.remove("active");
-        } else {
-            music.play().then(() => {
-                isPlaying = true;
-                toggleBtn.classList.add("active");
-            }).catch(err => console.warn("Autoplay bloqueado:", err));
-        }
-        isPlaying = !isPlaying;
-    });
+    document.addEventListener("click", firstInteraction);
+    document.addEventListener("touchstart", firstInteraction);
+    document.addEventListener("scroll", firstInteraction);
 
 });
