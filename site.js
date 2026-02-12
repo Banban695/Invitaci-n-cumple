@@ -2,7 +2,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     /* ===== FADE SECTIONS ===== */
     const sections = document.querySelectorAll(".fade-section");
-
     const observer = new IntersectionObserver(entries => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
@@ -11,22 +10,32 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         });
     }, { threshold: 0.15 });
-
     sections.forEach(section => observer.observe(section));
-
 
     /* ===== CORTINA ===== */
     const enterBtn = document.getElementById("enterBtn");
     const curtain = document.getElementById("introCurtain");
     const sound = document.getElementById("curtainSound");
 
+    // Música de fondo
+    const music = document.getElementById("bgMusic");
+    const toggleBtn = document.getElementById("musicToggle");
+    let isPlaying = false;
+
     if (enterBtn && curtain) {
         enterBtn.addEventListener("click", () => {
 
-            // 🔊 Sonido
+            // 🔊 Sonido cortina
             if (sound) {
                 sound.currentTime = 0;
-                sound.play().catch(() => { });
+                sound.play().catch(() => {});
+            }
+
+            // 🔊 Música de fondo
+            if (music && !isPlaying) {
+                music.play().catch(() => {});
+                isPlaying = true;
+                toggleBtn.classList.add("active");
             }
 
             // ✨ Animación fade
@@ -40,7 +49,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
         });
     }
-
 
     /* ===== COUNTDOWN ===== */
     const eventDate = new Date("March 07, 2026 16:00:00").getTime();
@@ -59,7 +67,6 @@ document.addEventListener("DOMContentLoaded", () => {
         animateNumber("minutes", m);
         animateNumber("seconds", s);
 
-        /* Glow cuando faltan menos de 3 días */
         if (d <= 3) {
             document.querySelectorAll(".time-box").forEach(box => box.classList.add("urgent"));
         }
@@ -67,7 +74,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function animateNumber(id, newValue) {
         const el = document.getElementById(id);
-
         if (el.textContent != String(newValue).padStart(2, "0")) {
             el.classList.add("flip");
             setTimeout(() => {
@@ -82,14 +88,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
 });
 
-
 /* ===== SLIDERS ===== */
 document.querySelectorAll("[data-slider]").forEach(slider => {
 
     let index = 0;
     const images = slider.querySelectorAll("img");
 
-    // Tomamos los botones prev/next del mismo slider
+    // Contenedor que incluye slider + botones
     const sliderContainer = slider.closest(".iphone-screen");
     const prev = sliderContainer.querySelector(".prev");
     const next = sliderContainer.querySelector(".next");
@@ -119,25 +124,20 @@ document.querySelectorAll("[data-slider]").forEach(slider => {
 
 });
 
-
 /* ===== DIVIDERS ANIMATION ===== */
 const dividers = document.querySelectorAll(".title-divider, .mini-title-divider");
-
-const dividerObserver = new IntersectionObserver((entries) => {
+const dividerObserver = new IntersectionObserver(entries => {
     entries.forEach(entry => {
         if (entry.isIntersecting) {
             entry.target.classList.add("active-divider");
         }
     });
 }, { threshold: 0.4 });
-
 dividers.forEach(div => dividerObserver.observe(div));
 
-
-/* ===== MÚSICA ===== */
+/* ===== MUSIC TOGGLE ===== */
 const music = document.getElementById("bgMusic");
 const toggleBtn = document.getElementById("musicToggle");
-
 let isPlaying = false;
 
 toggleBtn.addEventListener("click", () => {
@@ -145,16 +145,8 @@ toggleBtn.addEventListener("click", () => {
         music.pause();
         toggleBtn.classList.remove("active");
     } else {
-        music.play();
+        music.play().catch(() => {});
         toggleBtn.classList.add("active");
     }
     isPlaying = !isPlaying;
 });
-
-//document.addEventListener("click", () => {
-    //if (!isPlaying) {
-        //music.play();
-        //isPlaying = true;
-        //toggleBtn.classList.add("active");
-   // }
-//}, { once: true });
