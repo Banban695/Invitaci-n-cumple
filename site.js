@@ -1,16 +1,5 @@
 document.addEventListener("DOMContentLoaded", () => {
 
-    /* ===== ELEMENTOS ===== */
-
-    const enterBtn = document.getElementById("enterBtn");
-    const curtain = document.getElementById("introCurtain");
-    const curtainSound = document.getElementById("curtainSound");
-    const bgMusic = document.getElementById("bgMusic");
-    const musicToggle = document.getElementById("musicToggle");
-
-    let musicStarted = false;
-
-
     /* ===== FADE SECTIONS ===== */
 
     const sections = document.querySelectorAll(".fade-section");
@@ -27,16 +16,35 @@ document.addEventListener("DOMContentLoaded", () => {
     sections.forEach(section => observer.observe(section));
 
 
-    /* ===== CORTINA + MUSICA ===== */
+
+    /* ===== ELEMENTOS PRINCIPALES ===== */
+
+    const enterBtn = document.getElementById("enterBtn");
+    const curtain = document.getElementById("introCurtain");
+    const curtainSound = document.getElementById("curtainSound");
+
+    const bgMusic = document.getElementById("bgMusic");
+    const musicToggle = document.getElementById("musicToggle");
+
+
+
+    /* ===== CORTINA + MÚSICA ===== */
 
     if (enterBtn && curtain) {
 
         enterBtn.addEventListener("click", () => {
 
             // 🔊 Sonido cortina
-           if (curtainSound) {
+            if (curtainSound) {
                 curtainSound.currentTime = 0;
                 curtainSound.play().catch(() => {});
+            }
+
+            // 🎵 Música fondo
+            if (bgMusic) {
+                bgMusic.play().then(() => {
+                    musicToggle?.classList.add("active");
+                }).catch(e => console.log("Autoplay bloqueado:", e));
             }
 
             // ✨ Animación cortina
@@ -48,51 +56,28 @@ document.addEventListener("DOMContentLoaded", () => {
                 document.body.style.overflow = "auto";
             }, 1000);
 
-
-            // 🎵 Música fondo (solo una vez)
-            if (!musicStarted && bgMusic) {
-
-                bgMusic.currentTime = 0;
-
-                bgMusic.play()
-                    .then(() => {
-                        musicStarted = true;
-                        musicToggle.classList.add("active");
-                    })
-                    .catch(err => {
-                        console.log("Autoplay bloqueado:", err);
-                    });
-
-            }
-
         });
 
     }
 
 
-    /* ===== BOTON MUSICA ===== */
 
-    if (musicToggle && bgMusic) {
+    /* ===== BOTÓN DE MÚSICA ===== */
 
-        musicToggle.addEventListener("click", () => {
+    function toggleMusic() {
+        if (!bgMusic) return;
 
-            if (bgMusic.paused) {
-
-                bgMusic.play()
-                    .then(() => {
-                        musicToggle.classList.add("active");
-                    });
-
-            } else {
-
-                bgMusic.pause();
-                musicToggle.classList.remove("active");
-
-            }
-
-        });
-
+        if (bgMusic.paused) {
+            bgMusic.play();
+            musicToggle?.classList.add("active");
+        } else {
+            bgMusic.pause();
+            musicToggle?.classList.remove("active");
+        }
     }
+
+    musicToggle?.addEventListener("click", toggleMusic);
+
 
 
     /* ===== COUNTDOWN ===== */
@@ -114,27 +99,27 @@ document.addEventListener("DOMContentLoaded", () => {
         animateNumber("minutes", m);
         animateNumber("seconds", s);
 
+        if (d <= 3) {
+            document.querySelectorAll(".time-box")
+                .forEach(box => box.classList.add("urgent"));
+        }
     }
 
-    function animateNumber(id, value) {
+    function animateNumber(id, newValue) {
 
         const el = document.getElementById(id);
-
         if (!el) return;
 
-        const formatted = String(value).padStart(2, "0");
-
-        if (el.textContent !== formatted) {
+        if (el.textContent !== String(newValue).padStart(2, "0")) {
 
             el.classList.add("flip");
 
             setTimeout(() => {
-                el.textContent = formatted;
+                el.textContent = String(newValue).padStart(2, "0");
                 el.classList.remove("flip");
             }, 200);
 
         }
-
     }
 
     setInterval(updateCountdown, 1000);
@@ -143,7 +128,8 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 
-/* ===== SLIDERS ===== */
+
+/* ===== SLIDER ===== */
 
 document.querySelectorAll("[data-slider]").forEach(slider => {
 
@@ -157,14 +143,43 @@ document.querySelectorAll("[data-slider]").forEach(slider => {
         slider.style.transform = `translateX(-${index * 100}%)`;
     }
 
-    next.addEventListener("click", () => {
+    next?.addEventListener("click", () => {
         index = (index + 1) % images.length;
         updateSlider();
     });
 
-    prev.addEventListener("click", () => {
+    prev?.addEventListener("click", () => {
         index = (index - 1 + images.length) % images.length;
         updateSlider();
     });
 
+    let startX = 0;
+
+    slider.addEventListener("touchstart", e => {
+        startX = e.touches[0].clientX;
+    });
+
+    slider.addEventListener("touchend", e => {
+        let endX = e.changedTouches[0].clientX;
+
+        if (startX - endX > 50) next?.click();
+        if (endX - startX > 50) prev?.click();
+    });
+
 });
+
+
+
+/* ===== DIVIDERS ===== */
+
+const dividers = document.querySelectorAll(".title-divider, .mini-title-divider");
+
+const dividerObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            entry.target.classList.add("active-divider");
+        }
+    });
+}, { threshold: 0.4 });
+
+dividers.forEach(div => dividerObserver.observe(div));
