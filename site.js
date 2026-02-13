@@ -24,35 +24,49 @@ document.addEventListener("DOMContentLoaded", () => {
     const bgMusic = document.getElementById("bgMusic");
     const musicToggle = document.getElementById("musicToggle");
 
+    let musicStarted = false;
+
 
     /* ===== FUNCIONES MUSICA ===== */
 
     function startMusic() {
+
         if (!bgMusic) return;
 
         bgMusic.currentTime = 0;
 
         bgMusic.play()
             .then(() => {
+                musicStarted = true;
                 musicToggle?.classList.add("active");
             })
             .catch(err => console.log("Autoplay bloqueado:", err));
     }
 
+
     function toggleMusic() {
+
         if (!bgMusic) return;
 
         if (bgMusic.paused) {
+
             bgMusic.play()
-                .then(() => musicToggle?.classList.add("active"))
+                .then(() => {
+                    musicToggle?.classList.add("active");
+                    musicStarted = true;
+                })
                 .catch(err => console.log("No se pudo reproducir:", err));
+
         } else {
+
             bgMusic.pause();
             musicToggle?.classList.remove("active");
         }
     }
 
-    /* Sincroniza botón si el audio cambia */
+
+    /* ===== SINCRONIZACIÓN BOTÓN ===== */
+
     bgMusic?.addEventListener("play", () => {
         musicToggle?.classList.add("active");
     });
@@ -61,7 +75,10 @@ document.addEventListener("DOMContentLoaded", () => {
         musicToggle?.classList.remove("active");
     });
 
-    musicToggle?.addEventListener("click", toggleMusic);
+
+    musicToggle?.addEventListener("click", () => {
+        toggleMusic();
+    });
 
 
     /* ===== CORTINA ===== */
@@ -70,13 +87,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
         enterBtn.addEventListener("click", () => {
 
+            /* Sonido cortina (no bloquea música) */
             if (curtainSound) {
                 curtainSound.currentTime = 0;
                 curtainSound.play().catch(() => {});
             }
 
-            // 🔥 IMPORTANTE: SIN DELAY para mantener el gesto del usuario
-            startMusic();
+            /* Solo inicia música si aún no ha iniciado */
+            if (!musicStarted) {
+                startMusic();
+            }
 
             curtain.style.opacity = "0";
             curtain.style.transition = "opacity 1s ease";
@@ -121,12 +141,14 @@ document.addEventListener("DOMContentLoaded", () => {
         const el = document.getElementById(id);
         if (!el) return;
 
-        if (el.textContent != String(newValue).padStart(2, "0")) {
+        const formatted = String(newValue).padStart(2, "0");
+
+        if (el.textContent !== formatted) {
 
             el.classList.add("flip");
 
             setTimeout(() => {
-                el.textContent = String(newValue).padStart(2, "0");
+                el.textContent = formatted;
                 el.classList.remove("flip");
             }, 200);
         }
@@ -169,6 +191,7 @@ document.querySelectorAll("[data-slider]").forEach(slider => {
     });
 
     slider.addEventListener("touchend", e => {
+
         let endX = e.changedTouches[0].clientX;
 
         if (startX - endX > 50) next?.click();
