@@ -24,43 +24,44 @@ document.addEventListener("DOMContentLoaded", () => {
     const bgMusic = document.getElementById("bgMusic");
     const musicToggle = document.getElementById("musicToggle");
 
-    let musicStarted = false;
-
 
     /* ===== FUNCIONES MUSICA ===== */
 
-  function startMusic() {
-    if (!bgMusic || musicStarted) return;
+    function startMusic() {
+        if (!bgMusic) return;
 
-    bgMusic.currentTime = 0;
+        bgMusic.currentTime = 0;
 
-    const playPromise = bgMusic.play();
-
-    if (playPromise !== undefined) {
-        playPromise
+        bgMusic.play()
             .then(() => {
-                musicStarted = true;
                 musicToggle?.classList.add("active");
             })
-            .catch(err => {
-                console.log("Autoplay bloqueado:", err);
-            });
+            .catch(err => console.log("Autoplay bloqueado:", err));
     }
-}
 
-function toggleMusic() {
-    if (!bgMusic) return;
+    function toggleMusic() {
+        if (!bgMusic) return;
 
-    if (bgMusic.paused) {
-        bgMusic.play().then(() => {
-            musicToggle?.classList.add("active");
-            musicStarted = true;
-        });
-    } else {
-        bgMusic.pause();
+        if (bgMusic.paused) {
+            bgMusic.play()
+                .then(() => musicToggle?.classList.add("active"))
+                .catch(err => console.log("No se pudo reproducir:", err));
+        } else {
+            bgMusic.pause();
+            musicToggle?.classList.remove("active");
+        }
+    }
+
+    /* Sincroniza botón si el audio cambia */
+    bgMusic?.addEventListener("play", () => {
+        musicToggle?.classList.add("active");
+    });
+
+    bgMusic?.addEventListener("pause", () => {
         musicToggle?.classList.remove("active");
-    }
-}
+    });
+
+    musicToggle?.addEventListener("click", toggleMusic);
 
 
     /* ===== CORTINA ===== */
@@ -69,18 +70,14 @@ function toggleMusic() {
 
         enterBtn.addEventListener("click", () => {
 
-            // 🔊 Sonido cortina
             if (curtainSound) {
                 curtainSound.currentTime = 0;
                 curtainSound.play().catch(() => {});
             }
 
-            // ⏳ Pequeño delay para evitar conflicto entre audios
-            setTimeout(() => {
-                startMusic();
-            }, 200);
+            // 🔥 IMPORTANTE: SIN DELAY para mantener el gesto del usuario
+            startMusic();
 
-            // ✨ Animación cortina
             curtain.style.opacity = "0";
             curtain.style.transition = "opacity 1s ease";
 
@@ -117,7 +114,6 @@ function toggleMusic() {
             document.querySelectorAll(".time-box")
                 .forEach(box => box.classList.add("urgent"));
         }
-
     }
 
     function animateNumber(id, newValue) {
@@ -133,9 +129,7 @@ function toggleMusic() {
                 el.textContent = String(newValue).padStart(2, "0");
                 el.classList.remove("flip");
             }, 200);
-
         }
-
     }
 
     setInterval(updateCountdown, 1000);
